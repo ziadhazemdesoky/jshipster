@@ -1,0 +1,44 @@
+# Node.js specific
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Output directories
+dist/
+build/
+coverage/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+debug.log
+
+# IDE files
+.vscode/
+*.sublime-workspace
+*.sublime-project
+
+# Dependency directories
+.pnp/
+.pnp.js
+.turbo/
+
+# TypeScript
+*.tsbuildinfo
+
+# Misc
+.cache/
+.parcel-cache/
+
+# GitHub Actions
+*.lock
