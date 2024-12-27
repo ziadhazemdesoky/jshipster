@@ -1,6 +1,6 @@
 {
   "name": "jshipster",
-  "version": "1.1.5",
+  "version": "1.1.7",
   "description": "JSHipster: A modular Node.js CLI that scaffolds TypeScript backends",
   "main": "dist/jshipster.js",
   "type": "module",
@@ -8,8 +8,8 @@
     "jshipster": "dist/jshipster.js"
   },
   "files": [
-  "dist/",
-  "src/templates/"
+    "dist/",
+    "src/templates/"
   ],
   "scripts": {
     "clean": "rm -rf dist",
@@ -30,7 +30,8 @@
     "commander": "^12.1.0",
     "express": "^4.21.2",
     "fs-extra": "^11.2.0",
-    "inquirer": "^12.3.0"
+    "inquirer": "^12.3.0",
+    "node-fetch": "^3.3.2"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",

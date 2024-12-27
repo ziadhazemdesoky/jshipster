@@ -19,8 +19,8 @@ program
     .description('Add a new module to the project (interactive if omitted)')
     .action(addModule);
 program
-    .command('list')
-    .description('List all available TypeScript module templates')
+    .command('list [searchTerm]')
+    .description('List all available TypeScript module templates with optional search term')
     .action(listModules);
 program
     .command('generate')
