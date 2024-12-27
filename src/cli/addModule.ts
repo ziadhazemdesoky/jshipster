@@ -24,15 +24,18 @@ export async function addModule(moduleName?: string) {
     ]);
     moduleName = answers.chosenModule.trim();
   }
-
+  
   let modulePath = path.resolve(__dirname, '../templates', moduleName);
 
   // Check if the module exists locally or fetch it from npm
   if (!fs.existsSync(modulePath)) {
+    if(!moduleName.startsWith('jhipster-')) {
+      moduleName = 'jshipster-' + moduleName;
+    }
     console.log(chalk.blue(`Fetching "${moduleName}" from npm...`));
     try {
       await import('child_process').then((cp) => {
-        cp.execSync(`npm install jshipster-${moduleName}`, { stdio: 'inherit' });
+        cp.execSync(`npm install ${moduleName}`, { stdio: 'inherit' });
       });
 
       const modulePackagePath = path.resolve(
