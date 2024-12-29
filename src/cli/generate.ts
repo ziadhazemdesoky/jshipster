@@ -216,7 +216,7 @@ function logError(error: unknown): void {
   console.log(chalk.red(`Error: ${error}`));
 }
 
-async function generateSwaggerFromControllers(controllersDir: string, outputFile: string) {
+export async function generateSwaggerFromControllers(controllersDir: string, outputFile: string) {
   const paths: Record<string, any> = {};
 
   // Read all controller files

@@ -6,6 +6,7 @@ import { loadTemplate, replacePlaceholders } from '../core/utils/templateUtils.j
 import { OrmType, RESOURCE_TYPES, ResourceType, SUPPORTED_ORMS } from '../core/resourceTypes.js';
 import { ensureDirectoryExists, writeFileSafely } from '../core/utils/fileUtils.js';
 import { generateRepositoryFactory } from '../core/utils/repositoryUtils.js';
+import { generateSwaggerFromControllers } from './generate.js';
 
 export async function createMicroservice(serviceName: string): Promise<void> {
     serviceName = serviceName.charAt(0).toUpperCase() + serviceName.slice(1);
@@ -47,6 +48,7 @@ export async function createMicroservice(serviceName: string): Promise<void> {
         { type: RESOURCE_TYPES.MODEL, name: `${serviceName}`, folder: 'src/models' },
         { type: RESOURCE_TYPES.REPOSITORY, name: `${serviceName}`, folder: 'src/repositories' },
         { type: RESOURCE_TYPES.DTO, name: `${serviceName}`, folder: 'src/dtos' },
+        { type: RESOURCE_TYPES.SWAGGER, name: `${serviceName}`, folder: './' }
     ];
 
     for (const component of components) {
@@ -56,6 +58,8 @@ export async function createMicroservice(serviceName: string): Promise<void> {
         if (component.type === RESOURCE_TYPES.REPOSITORY) {
             await generateRepository(component.name, componentDir, orm);
             generateRepositoryFactory(componentDir);
+        } else if (component.type === RESOURCE_TYPES.SWAGGER) {
+            await generateSwaggerFromControllers(`${serviceName}/src/controllers`, `./${serviceName.toLowerCase()}/swagger.yaml`)
         }
         else {
             await generateResourceFile(
@@ -67,7 +71,7 @@ export async function createMicroservice(serviceName: string): Promise<void> {
         }
     }
 
-    const templates = ['index', 'Dockerfile', 'tsconfig', 'package'];
+    const templates = ['index', 'Dockerfile', 'tsconfig', 'package', 'docker-compose'];
     for (const templateName of templates) {
         const rawTemplate = await loadTemplate(`microservice/${templateName}`);
         const fileContent = replacePlaceholders(rawTemplate, serviceName);
@@ -77,8 +81,10 @@ export async function createMicroservice(serviceName: string): Promise<void> {
                 : templateName === 'package'
                     ? 'package.json'
                     : templateName === 'tsconfig'
-                        ? 'tsconfig.json'
-                        : 'Dockerfile';
+                        ? 'tsconfig.json' :
+                        templateName === 'docker-compose' ?
+                            'docker-compose.yml'
+                            : 'Dockerfile';
         writeFileSafely(path.join(targetDir, fileName), fileContent);
     }
 

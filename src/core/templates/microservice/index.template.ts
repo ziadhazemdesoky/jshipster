@@ -1,12 +1,12 @@
 export const template = `import express from 'express';
 import {{resourceName.toLowerCase()}}Routes from './routes/{{resourceName.toLowerCase()}}.route';
 import mongoose from 'mongoose';
+const mongoUri = process.env.MONGO_URI || "mongodb://localhost:27017/comment-service";
 
-mongoose.connect('mongodb://localhost:27017/{{resourceName.toLowerCase()}}s').then(() => {
-  console.log('Connected to MongoDB');
-}).catch((error) => {
-  console.error('Error connecting to MongoDB:', error);
-})
+mongoose
+  .connect(mongoUri)
+  .then(() => console.log("Connected to MongoDB"))
+  .catch((err) => console.error("MongoDB connection error:", err));
 
 const app = express();
 

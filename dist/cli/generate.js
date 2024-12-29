@@ -182,7 +182,7 @@ function getTemplateName(resourceType, orm) {
 function logError(error) {
     console.log(chalk.red(`Error: ${error}`));
 }
-async function generateSwaggerFromControllers(controllersDir, outputFile) {
+export async function generateSwaggerFromControllers(controllersDir, outputFile) {
     const paths = {};
     // Read all controller files
     const controllerFiles = fs
