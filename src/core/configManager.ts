@@ -11,6 +11,7 @@ export interface JSHipsterConfig {
     repository?: string;
     dto?: string;
     tsconfig?: string;
+    swagger?: string;
     module?: string;
   };
   [key: string]: any;
@@ -62,6 +63,7 @@ export class ConfigManager {
         repository: 'src/repositories',
         dto: 'src/dtos',
         tsconfig: './',
+        swagger: './',
         module: 'src'
       },
     };

@@ -1,5 +1,4 @@
-export const template = `
-import { IRepository } from '../repositories/repository.interface';
+export const template = `import { IRepository } from '../repositories/repository.interface';
 import { {{resourceName}}DTO, Create{{resourceName}}DTO, Update{{resourceName}}DTO } from '../dtos/{{resourceName.toLowerCase()}}.dto';
 
 export class {{resourceName}}Service {

@@ -1,5 +1,4 @@
-export const template = `
-export interface IRepository<T> {
+export const template = `export interface IRepository<T> {
   findById(id: string): Promise<T | null>;
   findAll(): Promise<T[]>;
   create(data: Partial<T>): Promise<T>;

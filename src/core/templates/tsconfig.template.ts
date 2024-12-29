@@ -1,5 +1,4 @@
-export const template = `
-{
+export const template = `{
     "compilerOptions": {
         "module": "NodeNext",          // Aligns with moduleResolution
         "moduleResolution": "NodeNext", // Resolves imports in Node.js ESM style

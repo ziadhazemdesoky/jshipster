@@ -1,5 +1,4 @@
-export const template = `
-import { Router, Request, Response } from 'express';
+export const template = `import { Router, Request, Response } from 'express';
 import { {{resourceName}}Controller } from '../controllers/{{resourceName.toLowerCase()}}.controller';
 
 const router = Router();

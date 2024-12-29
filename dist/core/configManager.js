@@ -39,6 +39,7 @@ export class ConfigManager {
                 repository: 'src/repositories',
                 dto: 'src/dtos',
                 tsconfig: './',
+                swagger: './',
                 module: 'src'
             },
         };

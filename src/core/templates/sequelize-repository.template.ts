@@ -1,5 +1,4 @@
-export const template = `
-import { Model, WhereOptions } from 'sequelize';
+export const template = `import { Model, WhereOptions } from 'sequelize';
 import { IRepository } from './repository.interface';
 import {{resourceName}}, { {{resourceName}}Attributes, {{resourceName}}CreationAttributes } from '../models/{{resourceName.toLowerCase()}}.model';
 import { {{resourceName}}DTO } from '../dtos/{{resourceName.toLowerCase()}}.dto';

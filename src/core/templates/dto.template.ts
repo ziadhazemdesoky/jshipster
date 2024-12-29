@@ -1,5 +1,4 @@
-export const template = `
-export interface {{resourceName}}DTO {
+export const template = `export interface {{resourceName}}DTO {
   id: string;
   name: string;
   description?: string;

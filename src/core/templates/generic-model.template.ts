@@ -1,5 +1,4 @@
-export const template = `
-/**
+export const template = `/**
  * Interface representing the structure of the {{resourceName}} resource
  */
 export interface {{resourceName}} {

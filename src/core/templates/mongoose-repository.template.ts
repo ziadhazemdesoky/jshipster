@@ -1,5 +1,4 @@
-export const template = `
-import { Model } from 'mongoose';
+export const template = `import { Model } from 'mongoose';
 import { {{resourceName}}, I{{resourceName}} } from '../models/{{resourceName.toLowerCase()}}.model';
 import { IRepository } from './repository.interface';
 import { {{resourceName}}DTO } from '../dtos/{{resourceName.toLowerCase()}}.dto';

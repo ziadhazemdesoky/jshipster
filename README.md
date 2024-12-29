@@ -9,9 +9,46 @@ JSHipster is a modular Node.js CLI designed to simplify and accelerate backend d
 - **Project Initialization**: Scaffold a new backend project with a clean, modular structure.
 - **Add Modules**: Add reusable modules, either locally or from npm, to enhance your project.
 - **List Modules**: View available modules from local templates or user-made modules (starting with `jshipster-`).
-- **Generate Resources**: Dynamically generate resources like services and controllers in TypeScript.
-- **Create Modules**: Create a new reusable module with a professional structure, ready for npm publishing.
+- **Generate Resources**: Dynamically generate resources like services, controllers, and DTOs in TypeScript. Generate standalone assets such as `swagger.yaml` based on available controllers and JSDocs or a `tsconfig.json` file.
+- **Create Full Modules**: Create a fully functional module in one command, or generate a single part of a module if needed (e.g., controller, service, DTO).
+- **Production-Ready Microservices**: Quickly create a fully ready microservice with predefined structure. Just run `npm install` and start the service. Modify model properties as needed for your use case.
 - **Customizable Configuration**: Tailor your project’s structure using `jshipster.config.json` for directory mappings and module settings.
+
+---
+
+## **Commands**
+
+JSHipster provides a variety of commands to suit your development needs:
+
+- `init`: Initialize a new JSHipster project interactively.
+  ```bash
+  jshipster init
+  ```
+
+- `add [moduleName]`: Add a new module to the project. Run interactively if `moduleName` is omitted.
+  ```bash
+  jshipster add auth-jwt
+  ```
+
+- `list [searchTerm]`: List all available TypeScript module templates, optionally filtered by `searchTerm`.
+  ```bash
+  jshipster list
+  ```
+
+- `generate`: Generate a resource (e.g., service, controller, DTO) or standalone assets like `swagger.yaml`.
+  ```bash
+  jshipster generate
+  ```
+
+- `create [moduleName]`: Create a new npm-ready module with a professional structure.
+  ```bash
+  jshipster create auth-module
+  ```
+
+- `create-microservice <serviceName>`: Generate a fully configured microservice with production-ready setup.
+  ```bash
+  jshipster create-microservice user-service
+  ```
 
 ---
 
@@ -47,7 +84,7 @@ Here’s how you can use JSHipster to streamline your backend development:
    ```
 
 4. **Generate a Resource**  
-   Dynamically generate a service or controller:
+   Dynamically generate a full module, service, controller, DTO, or standalone assets like `swagger.yaml`:
    ```bash
    jshipster generate
    ```
@@ -58,14 +95,23 @@ Here’s how you can use JSHipster to streamline your backend development:
    jshipster create
    ```
 
-6. **Customize Your Project with `jshipster.config.json`**  
+6. **Create a Fully Configured Microservice**  
+   Generate a production-ready microservice:
+   ```bash
+   jshipster create-microservice user
+   ```
+
+7. **Customize Your Project with `jshipster.config.json`**  
    Tailor the project’s directory structure and module settings by editing `jshipster.config.json`. For example:
    ```json
    {
      "directories": {
-       "controllers": "src/custom-controllers",
-       "services": "src/custom-services",
-       "routes": "src/custom-routes"
+       "controller": "src/custom-controllers-path",
+       "service": "src/custom-services-path",
+       "dto": "src/custom-dtos-path",
+       "route": "src/custom-routes-path",
+       "model": "src/custom-models-path",
+       "repository": "src/custom-repositories-path"
      },
      "modules": {
        "auth-jwt": {
@@ -104,6 +150,7 @@ JSHipster is open source and thrives on community contributions. Here’s how yo
 - **Reusable Ecosystem**: Leverage and contribute to a growing library of reusable modules.
 - **TypeScript First**: All scaffolding and modules are built with TypeScript, ensuring strong typing and modern development practices.
 - **Customizable**: Use `jshipster.config.json` to adapt the tool to your project’s specific requirements.
+- **Production-Ready**: Generate microservices ready for deployment with minimal configuration.
 - **Open Source**: Join a community of developers shaping the future of backend development.
 
 ---
@@ -117,4 +164,3 @@ Ready to try JSHipster? Install it globally and start building better backends, 
 ## **License**
 
 This project is licensed under the MIT License.
-

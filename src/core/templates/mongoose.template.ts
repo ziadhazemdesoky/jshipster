@@ -1,5 +1,4 @@
-export const template = `
-import mongoose, { Schema, Document } from 'mongoose';
+export const template = `import mongoose, { Schema, Document } from 'mongoose';
 
 /**
  * Interface representing the structure of the {{resourceName}} document

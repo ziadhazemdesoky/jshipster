@@ -6,6 +6,7 @@ export const RESOURCE_TYPES = {
   DTO: 'dto',
   MODEL: 'model',
   TSCONFIG: 'tsconfig',
+  SWAGGER: 'swagger',
   FULL_MODULE: 'full-module',
 } as const;
 

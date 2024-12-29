@@ -1,5 +1,4 @@
-export const template = `
-import { DataTypes, Model, Optional } from 'sequelize';
+export const template = `import { DataTypes, Model, Optional } from 'sequelize';
 import { sequelize } from '../core/database'; // Adjust the path to your database instance
 
 // Define the attributes for the {{resourceName}} model
