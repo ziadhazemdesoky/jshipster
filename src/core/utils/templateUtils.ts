@@ -1,17 +1,24 @@
 import path from 'path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export async function loadTemplate(templateName: string): Promise<string> {
-try {
- const templatePath = path.resolve(__dirname, `../templates/${templateName}.template.js`);
- const { template } = await import(templatePath);
- return template;
-} catch (err) {
- throw new Error(`Failed to load template: ${templateName}. Error: ${err}`);
-}
+    try {
+        // Resolve the template path
+        const templatePath = path.resolve(__dirname, `../templates/${templateName}.template.js`);
+
+        // Convert the path to a file URL for dynamic import
+        const templateUrl = pathToFileURL(templatePath).href;
+
+        // Dynamically import the template file
+        const { template } = await import(templateUrl);
+
+        return template;
+    } catch (err) {
+        throw new Error(`Failed to load template: ${templateName}. Error: ${err}`);
+    }
 }
 
 export function replacePlaceholders(template: string, placeholder: string): string {
