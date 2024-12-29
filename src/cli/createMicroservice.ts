@@ -117,7 +117,7 @@ function getTemplateName(resourceType: ResourceType, orm?: OrmType): string {
         [RESOURCE_TYPES.DTO]: 'dto',
         [RESOURCE_TYPES.MODEL]: 'model',
         [RESOURCE_TYPES.TSCONFIG]: 'tsconfig',
-        [RESOURCE_TYPES.MICROSERVICE]: 'microservice',
+        [RESOURCE_TYPES.FULL_MODULE]: 'full-module'
     };
 
     return templates[resourceType] || '';

@@ -32,12 +32,14 @@ export class ConfigManager {
         return {
             modules: {},
             directories: {
-                controllers: 'src/controllers',
-                services: 'src/services',
-                routes: 'src/routes',
-                models: 'src/models',
-                repositories: 'src/repositories',
-                dtos: 'src/dtos',
+                controller: 'src/controllers',
+                service: 'src/services',
+                route: 'src/routes',
+                model: 'src/models',
+                repository: 'src/repositories',
+                dto: 'src/dtos',
+                tsconfig: './',
+                module: 'src'
             },
         };
     }

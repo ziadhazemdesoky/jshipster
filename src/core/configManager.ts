@@ -4,12 +4,14 @@ import path from 'path';
 export interface JSHipsterConfig {
   modules: Record<string, any>;
   directories?: {
-    controllers?: string;
-    services?: string;
-    routes?: string;
-    models?: string;
-    repositories?: string;
-    dtos?: string;
+    controller?: string;
+    service?: string;
+    route?: string;
+    model?: string;
+    repository?: string;
+    dto?: string;
+    tsconfig?: string;
+    module?: string;
   };
   [key: string]: any;
 }
@@ -53,12 +55,14 @@ export class ConfigManager {
     return {
       modules: {},
       directories: {
-        controllers: 'src/controllers',
-        services: 'src/services',
-        routes: 'src/routes',
-        models: 'src/models',
-        repositories: 'src/repositories',
-        dtos: 'src/dtos',
+        controller: 'src/controllers',
+        service: 'src/services',
+        route: 'src/routes',
+        model: 'src/models',
+        repository: 'src/repositories',
+        dto: 'src/dtos',
+        tsconfig: './',
+        module: 'src'
       },
     };
   }
