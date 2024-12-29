@@ -18,7 +18,7 @@ app.get('/health', (req, res) => {
 
 app.use('/{{resourceName.toLowerCase()}}s', {{resourceName.toLowerCase()}}Routes);
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(\`Microservice running on port \${PORT}\`);
 });

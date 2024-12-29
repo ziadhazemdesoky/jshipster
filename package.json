@@ -1,6 +1,6 @@
 {
   "name": "jshipster",
-  "version": "2.0.3",
+  "version": "2.0.5",
   "description": "JSHipster: A modular Node.js CLI that scaffolds TypeScript backends",
   "main": "dist/jshipster.js",
   "type": "module",

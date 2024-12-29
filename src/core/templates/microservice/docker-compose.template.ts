@@ -18,6 +18,7 @@ services:
       - "3000:3000"
     environment:
       - MONGO_URI=mongodb://mongo:27017/{{resourceName.toLowerCase()}}-service
+      - PORT=3000
     depends_on:
       - mongo
     networks:
