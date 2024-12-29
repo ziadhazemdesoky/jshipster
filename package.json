@@ -9,7 +9,9 @@
   },
   "files": [
     "dist/",
-    "src/templates/"
+    "src/templates/",
+    "src/core/templates/microservice/Dockerfile",
+    "src/core/templates/microservice/.env"
   ],
   "scripts": {
     "clean": "rm -rf dist",

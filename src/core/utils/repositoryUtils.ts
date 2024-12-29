@@ -1,7 +1,6 @@
 import fs from 'fs';
 import path from 'path';
 import chalk from 'chalk';
-import { SUPPORTED_ORMS } from '../resourceTypes.js';
 
 /**
  * Automatically generate the RepositoryFactory based on available repository files and SUPPORTED_ORMS

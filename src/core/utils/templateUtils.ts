@@ -7,7 +7,6 @@ const __dirname = path.dirname(__filename);
 export async function loadTemplate(templateName: string): Promise<string> {
 try {
  const templatePath = path.resolve(__dirname, `../templates/${templateName}.template.js`);
- console.log(templatePath);
  const { template } = await import(templatePath);
  return template;
 } catch (err) {

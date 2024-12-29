@@ -5,6 +5,7 @@ import { addModule } from './cli/addModule.js';
 import { listModules } from './cli/listModules.js';
 import { generateResource } from './cli/generate.js';
 import { createModule } from './cli/createModule.js';
+import { createMicroservice } from './cli/createMicroservice.js';
 const program = new Command();
 program
     .name('jshipster')
@@ -30,4 +31,8 @@ program
     .command('create [moduleName]')
     .description('Create a new module on npm')
     .action(createModule);
+program
+    .command('create-microservice <serviceName>')
+    .description('Create a new microservice with a predefined structure.')
+    .action(createMicroservice);
 program.parse(process.argv);

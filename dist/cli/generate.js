@@ -26,6 +26,10 @@ export async function generateResource() {
         if (resourceType === RESOURCE_TYPES.REPOSITORY) {
             await generateRepository(resourceName, fullTargetDir, repository);
         }
+        else if (resourceType === RESOURCE_TYPES.TSCONFIG) {
+            const tsconfigTemplate = await loadTemplate('tsconfig');
+            writeFileSafely(path.join(fullTargetDir, 'tsconfig.json'), tsconfigTemplate);
+        }
         else {
             await generateResourceFile(resourceName, resourceType, orm, fullTargetDir);
         }
@@ -67,6 +71,7 @@ async function promptUserForResourceDetails() {
     ]);
 }
 async function generateRepository(resourceName, targetDir, repository) {
+    resourceName = resourceName.charAt(0).toUpperCase() + resourceName.slice(1);
     // Check if repository interface file exists 
     if (!fs.existsSync(path.join(targetDir, 'repository.interface.ts'))) {
         console.log(chalk.yellow(`Repository interface file already exists already, skipping interface creation...`));
@@ -87,6 +92,7 @@ async function generateRepository(resourceName, targetDir, repository) {
     }
 }
 async function generateResourceFile(resourceName, resourceType, orm, targetDir) {
+    resourceName = resourceName.charAt(0).toUpperCase() + resourceName.slice(1);
     const templateName = getTemplateName(resourceType, orm);
     const rawTemplate = await loadTemplate(templateName);
     const fileContent = replacePlaceholders(rawTemplate, resourceName);
@@ -99,7 +105,10 @@ function getTargetDirectoryKey(resourceType) {
         [RESOURCE_TYPES.CONTROLLER]: 'controllers',
         [RESOURCE_TYPES.MODEL]: 'models',
         [RESOURCE_TYPES.REPOSITORY]: 'repositories',
+        [RESOURCE_TYPES.ROUTE]: 'routes',
         [RESOURCE_TYPES.DTO]: 'dtos',
+        [RESOURCE_TYPES.TSCONFIG]: 'tsconfig',
+        [RESOURCE_TYPES.MICROSERVICE]: 'microservices',
     };
     return directoryMappings[resourceType] || null;
 }
@@ -115,9 +124,12 @@ function getTemplateName(resourceType, orm) {
     const templates = {
         [RESOURCE_TYPES.SERVICE]: 'service',
         [RESOURCE_TYPES.CONTROLLER]: 'controller',
+        [RESOURCE_TYPES.ROUTE]: 'route',
         [RESOURCE_TYPES.REPOSITORY]: `${orm?.split(' ')[0]}-repository`,
         [RESOURCE_TYPES.DTO]: 'dto',
         [RESOURCE_TYPES.MODEL]: 'model',
+        [RESOURCE_TYPES.TSCONFIG]: 'tsconfig',
+        [RESOURCE_TYPES.MICROSERVICE]: 'microservice',
     };
     return templates[resourceType] || '';
 }

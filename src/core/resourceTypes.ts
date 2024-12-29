@@ -1,9 +1,12 @@
 export const RESOURCE_TYPES = {
     SERVICE: 'service',
     CONTROLLER: 'controller',
+    ROUTE: 'route',
     MODEL: 'model',
     REPOSITORY: 'repository',
     DTO: 'dto',
+    TSCONFIG: 'tsconfig',
+    MICROSERVICE: 'microservice',
   } as const;
   
   export const SUPPORTED_ORMS = {

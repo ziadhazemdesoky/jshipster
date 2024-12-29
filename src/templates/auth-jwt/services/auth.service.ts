@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 
 const SECRET_KEY = process.env.JWT_SECRET || 'defaultSecret';
 const TOKEN_EXPIRATION = '1h';
@@ -14,12 +14,12 @@ export class AuthService {
   /**
    * Verify the validity of a JWT.
    */
-  public verifyToken(token: string): object | null {
+  public verifyToken(token: string): string | JwtPayload {
     try {
       return jwt.verify(token, SECRET_KEY);
     } catch (error) {
       console.error('Invalid token:', error);
-      return null;
+      return '';
     }
   }
 

@@ -86,6 +86,9 @@ export async function addModule(moduleName?: string) {
   configManager.setModule(moduleName, {
     installedAt: new Date().toISOString(),
   });
-
+  // execute npm i --save-dev @types/jsonwebtoken and npm i jsonwebtoken
+  await import('child_process').then((cp) => {
+    cp.execSync(`npm install jsonwebtoken --save-dev @types/jsonwebtoken`, { stdio: 'inherit' });
+  });
   console.log(chalk.green(`Module "${moduleName}" installed successfully!`));
 }
