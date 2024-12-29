@@ -3,6 +3,7 @@
   "version": "1.1.7",
   "description": "JSHipster: A modular Node.js CLI that scaffolds TypeScript backends",
   "main": "dist/jshipster.js",
+  "type": "module",
   "bin": {
     "jshipster": "dist/jshipster.js"
   },
