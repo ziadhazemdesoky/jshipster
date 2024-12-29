@@ -32,6 +32,8 @@ export function init(app: Application) {
     fs.mkdirSync(path.join(modulePath, 'services'));
     fs.mkdirSync(path.join(modulePath, 'controllers'));
     fs.mkdirSync(path.join(modulePath, 'routes'));
+    fs.mkdirSync(path.join(modulePath, 'models'));
+    fs.mkdirSync(path.join(modulePath, 'repositories'));
     // Create a package.json
     fs.writeFileSync(path.join(modulePath, 'package.json'), JSON.stringify({
         name: `jshipster-${moduleName.toLowerCase()}`,

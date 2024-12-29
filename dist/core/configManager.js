@@ -35,6 +35,9 @@ export class ConfigManager {
                 controllers: 'src/controllers',
                 services: 'src/services',
                 routes: 'src/routes',
+                models: 'src/models',
+                repositories: 'src/repositories',
+                dtos: 'src/dtos',
             },
         };
     }

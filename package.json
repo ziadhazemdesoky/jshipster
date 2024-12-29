@@ -26,11 +26,13 @@
   "author": "Ziad Hazem",
   "license": "MIT",
   "dependencies": {
+    "-": "^0.0.1",
     "chalk": "^4.1.2",
     "commander": "^12.1.0",
     "express": "^4.21.2",
     "fs-extra": "^11.2.0",
     "inquirer": "^12.3.0",
+    "jshipster": "^1.1.7",
     "node-fetch": "^3.3.2"
   },
   "devDependencies": {

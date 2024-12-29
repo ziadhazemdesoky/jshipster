@@ -44,7 +44,9 @@ export async function initProject() {
     directories: {
       controllers: 'src/controllers',
       services: 'src/services',
-      routes: 'src/routes'
+      routes: 'src/routes',
+      models: 'src/models',
+      repositories: 'src/repositories'
     }
 }, null, 2));
 

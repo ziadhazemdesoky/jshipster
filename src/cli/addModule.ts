@@ -57,7 +57,7 @@ export async function addModule(moduleName?: string) {
   console.log(chalk.green(`Installing module "${moduleName}"...`));
 
   // Distribute files into mapped directories
-  const moduleDirs = ['controllers', 'services', 'routes'];
+  const moduleDirs = ['controllers', 'services', 'routes', 'models', 'repositories', ];
   for (const dir of moduleDirs) {
     const sourceDir = path.join(modulePath, dir);
     const destinationDir = path.resolve(process.cwd(), directories[dir]);

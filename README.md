@@ -8,7 +8,7 @@ JSHipster is a modular Node.js CLI designed to simplify and accelerate backend d
 
 - **Project Initialization**: Scaffold a new backend project with a clean, modular structure.
 - **Add Modules**: Add reusable modules, either locally or from npm, to enhance your project.
-- **List Modules**: View available modules from local templates or user-made modules (starting with `jhipster-`).
+- **List Modules**: View available modules from local templates or user-made modules (starting with `jshipster-`).
 - **Generate Resources**: Dynamically generate resources like services and controllers in TypeScript.
 - **Create Modules**: Create a new reusable module with a professional structure, ready for npm publishing.
 - **Customizable Configuration**: Tailor your project’s structure using `jshipster.config.json` for directory mappings and module settings.
