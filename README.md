@@ -98,7 +98,7 @@ Here’s how you can use JSHipster to streamline your backend development:
 6. **Create a Fully Configured Microservice**  
    Generate a production-ready microservice:
    ```bash
-   jshipster create-microservice user
+   jshipster create-microservice cart
    ```
 
 7. **Customize Your Project with `jshipster.config.json`**  

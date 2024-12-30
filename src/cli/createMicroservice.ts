@@ -1,31 +1,52 @@
 import inquirer from 'inquirer';
 import chalk from 'chalk';
 import path from 'path';
-import fs from 'fs';
 import { loadTemplate, replacePlaceholders } from '../core/utils/templateUtils.js';
-import { OrmType, RESOURCE_TYPES, ResourceType, SUPPORTED_ORMS } from '../core/resourceTypes.js';
-import { ensureDirectoryExists, writeFileSafely } from '../core/utils/fileUtils.js';
-import { generateRepositoryFactory } from '../core/utils/repositoryUtils.js';
-import { generateSwaggerFromControllers } from './generate.js';
+import { OrmType, ResourceTypes, SupportedOrms } from '../core/resourceTypes.js';
+import { ensureDirectoryExists, generateResourceFile, writeFileSafely } from '../core/utils/fileUtils.js';
+import { generateRepository } from '../core/utils/repositoryUtils.js';
+import { generateSwaggerFromControllers } from '../core/utils/swaggerUtils.js';
 
 export async function createMicroservice(serviceName: string): Promise<void> {
-    serviceName = serviceName.charAt(0).toUpperCase() + serviceName.slice(1);
-    const targetDir = path.join(process.cwd(), serviceName.toLowerCase());
+    serviceName = capitalize(serviceName);
+    const targetDir = path.resolve(process.cwd(), serviceName.toLowerCase());
     ensureDirectoryExists(targetDir);
 
-    const { orm } = await inquirer.prompt<{ orm: OrmType }>([
+    const { orm } = await promptForOrm();
+
+    console.log(chalk.blue(`Selected ORM: ${orm}`));
+
+    // Define and create the folder structure
+    const folders = getMicroserviceFolders();
+    folders.forEach((folder) => ensureDirectoryExists(path.join(targetDir, folder)));
+
+    // Generate core components
+    const components = getMicroserviceComponents(serviceName);
+    await generateComponents(components, targetDir, orm, serviceName);
+
+    // Generate template files
+    await generateTemplateFiles(serviceName, targetDir);
+
+    console.log(chalk.green(`Microservice "${serviceName}" generated successfully in ${targetDir}.`));
+}
+
+function capitalize(str: string): string {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+async function promptForOrm(): Promise<{ orm: OrmType }> {
+    return inquirer.prompt([
         {
             type: 'list',
             name: 'orm',
             message: 'Select the ORM/DB for the microservice:',
-            choices: Object.values(SUPPORTED_ORMS),
+            choices: Object.values(SupportedOrms),
         },
     ]);
+}
 
-    console.log(chalk.blue(`Selected ORM: ${orm}`));
-
-    // Define the folder structure
-    const folders = [
+function getMicroserviceFolders(): string[] {
+    return [
         'src/controllers',
         'src/routes',
         'src/services',
@@ -36,117 +57,71 @@ export async function createMicroservice(serviceName: string): Promise<void> {
         'src/config',
         'src/utils',
     ];
+}
 
-    // Create folders
-    folders.forEach((folder) => ensureDirectoryExists(path.join(targetDir, folder)));
-
-    // Generate core components
-    const components = [
-        { type: RESOURCE_TYPES.ROUTE, name: `${serviceName}`, folder: 'src/routes' },
-        { type: RESOURCE_TYPES.CONTROLLER, name: `${serviceName}`, folder: 'src/controllers' },
-        { type: RESOURCE_TYPES.SERVICE, name: `${serviceName}`, folder: 'src/services' },
-        { type: RESOURCE_TYPES.MODEL, name: `${serviceName}`, folder: 'src/models' },
-        { type: RESOURCE_TYPES.REPOSITORY, name: `${serviceName}`, folder: 'src/repositories' },
-        { type: RESOURCE_TYPES.DTO, name: `${serviceName}`, folder: 'src/dtos' },
-        { type: RESOURCE_TYPES.SWAGGER, name: `${serviceName}`, folder: './' }
+function getMicroserviceComponents(serviceName: string): Array<{ type: ResourceTypes; name: string; folder: string }> {
+    return [
+        { type: ResourceTypes.ROUTE, name: serviceName, folder: 'src/routes' },
+        { type: ResourceTypes.CONTROLLER, name: serviceName, folder: 'src/controllers' },
+        { type: ResourceTypes.SERVICE, name: serviceName, folder: 'src/services' },
+        { type: ResourceTypes.MODEL, name: serviceName, folder: 'src/models' },
+        { type: ResourceTypes.REPOSITORY, name: serviceName, folder: 'src/repositories' },
+        { type: ResourceTypes.DTO, name: serviceName, folder: 'src/dtos' },
+        { type: ResourceTypes.SWAGGER, name: serviceName, folder: './' },
     ];
+}
 
+async function generateComponents(
+    components: Array<{ type: ResourceTypes; name: string; folder: string }>,
+    targetDir: string,
+    orm: OrmType,
+    serviceName: string
+): Promise<void> {
     for (const component of components) {
         console.log(chalk.blue(`Generating ${component.type} for ${serviceName}...`));
         const componentDir = path.join(targetDir, component.folder);
         ensureDirectoryExists(componentDir);
-        if (component.type === RESOURCE_TYPES.REPOSITORY) {
+
+        if (component.type === ResourceTypes.REPOSITORY) {
             await generateRepository(component.name, componentDir, orm);
-            generateRepositoryFactory(componentDir);
-        } else if (component.type === RESOURCE_TYPES.SWAGGER) {
-            await generateSwaggerFromControllers(`${serviceName}/src/controllers`, `./${serviceName.toLowerCase()}/swagger.yaml`)
-        }
-        else {
+        } else if (component.type === ResourceTypes.SWAGGER) {
+            await generateSwaggerFromControllers(
+                `${serviceName}/src/controllers`,
+                `./${serviceName.toLowerCase()}/swagger.yaml`
+            );
+        } else {
             await generateResourceFile(
                 component.name,
                 component.type,
-                component.type === RESOURCE_TYPES.MODEL ? orm : undefined,
-                componentDir
+                componentDir,
+                component.type === ResourceTypes.MODEL ? orm : undefined
             );
         }
     }
+}
 
+async function generateTemplateFiles(serviceName: string, targetDir: string): Promise<void> {
     const templates = ['index', 'Dockerfile', 'tsconfig', 'package', 'docker-compose'];
+
     for (const templateName of templates) {
         const rawTemplate = await loadTemplate(`microservice/${templateName}`);
         const fileContent = replacePlaceholders(rawTemplate, serviceName);
-        const fileName =
-            templateName === 'index'
-                ? 'src/index.ts'
-                : templateName === 'package'
-                    ? 'package.json'
-                    : templateName === 'tsconfig'
-                        ? 'tsconfig.json' :
-                        templateName === 'docker-compose' ?
-                            'docker-compose.yml'
-                            : 'Dockerfile';
+        const fileName = mapTemplateToFileName(templateName);
         writeFileSafely(path.join(targetDir, fileName), fileContent);
     }
-
-    console.log(chalk.green(`Microservice "${serviceName}" generated successfully in ${targetDir}.`));
 }
 
-async function generateResourceFile(
-    resourceName: string,
-    resourceType: ResourceType,
-    orm: OrmType | undefined,
-    targetDir: string
-) {
-    const templateName = getTemplateName(resourceType, orm);
-    const rawTemplate = await loadTemplate(templateName);
-    const fileContent = replacePlaceholders(rawTemplate, resourceName);
-    const fileName = `${resourceName.toLowerCase()}.${resourceType}.ts`;
-    writeFileSafely(path.join(targetDir, fileName), fileContent);
-}
-
-function getTemplateName(resourceType: ResourceType, orm?: OrmType): string {
-    const modelTemplates: Record<OrmType, string> = {
-        [SUPPORTED_ORMS.MONGOOSE]: 'mongoose',
-        [SUPPORTED_ORMS.SEQUELIZE]: 'sequelize',
-        [SUPPORTED_ORMS.GENERIC]: 'generic-model',
-    };
-
-    if (resourceType === RESOURCE_TYPES.MODEL) {
-        return modelTemplates[orm!] || 'generic-model';
-    }
-
-    const templates: Record<ResourceType, string> = {
-        [RESOURCE_TYPES.SERVICE]: 'service',
-        [RESOURCE_TYPES.CONTROLLER]: 'controller',
-        [RESOURCE_TYPES.ROUTE]: 'route',
-        [RESOURCE_TYPES.REPOSITORY]: `${orm?.split(' ')[0]}-repository`,
-        [RESOURCE_TYPES.DTO]: 'dto',
-        [RESOURCE_TYPES.MODEL]: 'model',
-        [RESOURCE_TYPES.TSCONFIG]: 'tsconfig',
-        [RESOURCE_TYPES.SWAGGER]: 'swagger',
-        [RESOURCE_TYPES.FULL_MODULE]: 'full-module'
-    };
-
-    return templates[resourceType] || '';
-}
-
-async function generateRepository(resourceName: string, targetDir: string, repository?: OrmType) {
-    // Check if repository interface file exists 
-    if (!fs.existsSync(path.join(targetDir, 'repository.interface.ts'))) {
-        console.log(chalk.yellow(`Repository interface file already exists already, skipping interface creation...`));
-        const repositoryInterfaceTemplate = await loadTemplate('repository-interface');
-        const repositoryInterface = replacePlaceholders(repositoryInterfaceTemplate, resourceName);
-        writeFileSafely(path.join(targetDir, 'repository.interface.ts'), repositoryInterface);
-    }
-
-    if (repository) {
-        const templateName = getTemplateName(RESOURCE_TYPES.REPOSITORY, repository);
-        const repositoryTemplate = await loadTemplate(templateName);
-        const repositoryContent = replacePlaceholders(repositoryTemplate, resourceName);
-        const repositoryFilePath = path.join(targetDir, `${resourceName.toLowerCase()}.repository.ts`);
-        writeFileSafely(repositoryFilePath, repositoryContent);
-        generateRepositoryFactory(targetDir);
-    } else {
-        console.log(chalk.yellow(`Generic repository support is not implemented.`));
+function mapTemplateToFileName(templateName: string): string {
+    switch (templateName) {
+        case 'index':
+            return 'src/index.ts';
+        case 'package':
+            return 'package.json';
+        case 'tsconfig':
+            return 'tsconfig.json';
+        case 'docker-compose':
+            return 'docker-compose.yml';
+        default:
+            return 'Dockerfile';
     }
 }

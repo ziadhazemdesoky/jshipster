@@ -1,11 +1,14 @@
 import fs from 'fs';
 import path from 'path';
 import chalk from 'chalk';
+import { writeFileSafely } from './fileUtils.js';
+import { getOrmTemplateName, loadTemplate, replacePlaceholders } from './templateUtils.js';
+import { OrmType, ResourceTypes, SupportedOrms } from '../resourceTypes.js';
 
 /**
  * Automatically generate the RepositoryFactory based on available repository files and SUPPORTED_ORMS
  */
-export function generateRepositoryFactory(repositoriesDir: string): void {
+function generateRepositoryFactory(repositoriesDir: string): void {
   const availableRepositories = getAvailableRepositories(repositoriesDir);
 
   if (Object.keys(availableRepositories).length === 0) {
@@ -13,12 +16,16 @@ export function generateRepositoryFactory(repositoriesDir: string): void {
     return;
   }
 
-  // Generate the factory content
   const factoryContent = generateFactoryContent(availableRepositories);
   const factoryFilePath = path.join(repositoriesDir, 'repository.factory.ts');
-  const fileExisting = fs.existsSync(factoryFilePath);
+
+  if (fs.existsSync(factoryFilePath)) {
+    console.log(chalk.green('Repository factory successfully updated.'));
+  } else {
+    console.log(chalk.green('Repository factory successfully generated.'));
+  }
+
   fs.writeFileSync(factoryFilePath, factoryContent, 'utf-8');
-  fileExisting ? console.log(chalk.green(`Repository factory successfully updated.`)) : console.log(chalk.green(`Repository factory successfully generated.`));
 }
 
 /**
@@ -27,21 +34,19 @@ export function generateRepositoryFactory(repositoriesDir: string): void {
  * @returns {Record<string, string>} - A map of ORM names to repository file paths
  */
 function getAvailableRepositories(directory: string): Record<string, string> {
-  const availableRepositories: Record<string, string> = {};
-
   try {
     const files = fs.readdirSync(directory);
-
-    files.forEach((file) => {
-      if(file.endsWith('.repository.ts')){
-      availableRepositories[file.replace('.repository.ts', '')] = file;
-    }
-    })
+    return files.reduce((acc, file) => {
+      if (file.endsWith('.repository.ts')) {
+        const name = file.replace('.repository.ts', '');
+        acc[name] = file;
+      }
+      return acc;
+    }, {} as Record<string, string>);
   } catch (error) {
-    console.error('Error reading repositories directory:', error);
+    console.error(chalk.red('Error reading repositories directory:'), error);
+    return {};
   }
-
-  return availableRepositories;
 }
 
 /**
@@ -50,19 +55,18 @@ function getAvailableRepositories(directory: string): Record<string, string> {
  * @returns {string} - The factory file content
  */
 function generateFactoryContent(availableRepositories: Record<string, string>): string {
-  const imports: string[] = [];
-  const factoryMethods: string[] = [];
+  const imports = Object.entries(availableRepositories).map(
+    ([repository, file]) => `import { ${capitalize(repository)}Repository } from './${file.replace('.ts', '')}';`
+  );
 
-  Object.entries(availableRepositories).forEach(([repository, file]) => {
-    const repositoryName = `${repository.charAt(0).toUpperCase() + repository.slice(1)}Repository`;
-    const factoryMethodName = `create${repository.charAt(0).toUpperCase() + repository.slice(1)}Repository`;
-    imports.push(`import { ${repository.charAt(0).toUpperCase() + repository.slice(1)}DTO } from '../dtos/${repository.toLowerCase()}.dto';`);
-    imports.push(`import { ${repositoryName} } from './${file.replace('.ts', '')}';`);
-    factoryMethods.push(`
-  ${factoryMethodName}(): IRepository<${repository.charAt(0).toUpperCase() + repository.slice(1)}DTO> {
-    return new ${repositoryName}();
-  },`);
-  });
+  const factoryMethods = Object.entries(availableRepositories).map(
+    ([repository]) => {
+      const repoName = capitalize(repository);
+      return `  create${repoName}Repository(): IRepository<${repoName}DTO> {
+    return new ${repoName}Repository();
+  },`;
+    }
+  );
 
   return `
 import { IRepository } from './repository.interface';
@@ -72,4 +76,49 @@ export const RepositoryFactory = {
 ${factoryMethods.join('\n')}
 };
 `;
+}
+
+/**
+ * Capitalizes the first letter of a string
+ * @param {string} str - Input string
+ * @returns {string} - Capitalized string
+ */
+function capitalize(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+/**
+ * Generates a repository file and the repository factory
+ * @param {string} resourceName - Name of the resource
+ * @param {string} targetDir - Target directory for the repository
+ * @param {OrmType | undefined} repository - Selected ORM type
+ */
+export async function generateRepository(
+  resourceName: string,
+  targetDir: string,
+  repository?: OrmType
+): Promise<void> {
+  const capitalizedResourceName = capitalize(resourceName);
+
+  // Ensure repository interface exists
+  const repositoryInterfacePath = path.join(targetDir, 'repository.interface.ts');
+  if (!fs.existsSync(repositoryInterfacePath)) {
+    const repositoryInterfaceTemplate = await loadTemplate('repository-interface');
+    const repositoryInterface = replacePlaceholders(repositoryInterfaceTemplate, capitalizedResourceName);
+    writeFileSafely(repositoryInterfacePath, repositoryInterface);
+  }
+
+  // Generate specific repository if ORM is provided
+  if (repository) {
+    const templateName = `${getOrmTemplateName(repository)}-${ResourceTypes.REPOSITORY}`;
+    const repositoryTemplate = await loadTemplate(templateName);
+    const repositoryContent = replacePlaceholders(repositoryTemplate, capitalizedResourceName);
+    const repositoryFilePath = path.join(targetDir, `${resourceName.toLowerCase()}.repository.ts`);
+    writeFileSafely(repositoryFilePath, repositoryContent);
+  } else {
+    console.log(chalk.yellow('Generic repository support is not implemented.'));
+  }
+
+  // Update repository factory
+  generateRepositoryFactory(targetDir);
 }

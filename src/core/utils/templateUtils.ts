@@ -1,5 +1,6 @@
 import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
+import { SupportedOrms } from '../resourceTypes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -29,3 +30,12 @@ export function replacePlaceholders(template: string, placeholder: string): stri
     result = result.replace(lowerCasePlaceholder, placeholder.toLowerCase());
     return result;
 }
+
+export function getOrmTemplateName(orm: SupportedOrms): string {
+    const modelTemplates: Record<SupportedOrms, string> = {
+      [SupportedOrms.MONGOOSE]: 'mongoose',
+      [SupportedOrms.SEQUELIZE]: 'sequelize',
+      [SupportedOrms.GENERIC]: 'generic-model',
+    };
+    return modelTemplates[orm];
+  }

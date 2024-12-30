@@ -38,11 +38,11 @@ export function init(app: Application) {
   );
 
   // Create optional subdirectories
-  fs.mkdirSync(path.join(modulePath, 'services'));
-  fs.mkdirSync(path.join(modulePath, 'controllers'));
-  fs.mkdirSync(path.join(modulePath, 'routes'));
-  fs.mkdirSync(path.join(modulePath, 'models'));
-  fs.mkdirSync(path.join(modulePath, 'repositories'));
+  fs.mkdirSync(path.join(modulePath, 'service'));
+  fs.mkdirSync(path.join(modulePath, 'controller'));
+  fs.mkdirSync(path.join(modulePath, 'route'));
+  fs.mkdirSync(path.join(modulePath, 'model'));
+  fs.mkdirSync(path.join(modulePath, 'repository'));
 
   // Create a package.json
   fs.writeFileSync(

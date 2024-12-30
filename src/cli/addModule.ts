@@ -8,6 +8,11 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const moduleConfiguration = {
+  directories: ['controller', 'service', 'route', 'model', 'repository'],
+  mainEntry: 'index.ts',
+};
+
 export async function addModule(moduleName?: string) {
   const configManager = new ConfigManager();
   const directories = configManager.getDirectories();
@@ -24,13 +29,13 @@ export async function addModule(moduleName?: string) {
     ]);
     moduleName = answers.chosenModule.trim();
   }
-  
+
   let modulePath = path.resolve(__dirname, '../templates', moduleName);
 
   // Check if the module exists locally or fetch it from npm
   if (!fs.existsSync(modulePath)) {
-    if(!moduleName.startsWith('jhipster-')) {
-      moduleName = 'jshipster-' + moduleName;
+    if (!moduleName.startsWith('jhipster-')) {
+      moduleName = 'jhipster-' + moduleName;
     }
     console.log(chalk.blue(`Fetching "${moduleName}" from npm...`));
     try {
@@ -57,8 +62,7 @@ export async function addModule(moduleName?: string) {
   console.log(chalk.green(`Installing module "${moduleName}"...`));
 
   // Distribute files into mapped directories
-  const moduleDirs = ['controllers', 'services', 'routes', 'models', 'repositories', ];
-  for (const dir of moduleDirs) {
+  for (const dir of moduleConfiguration.directories) {
     const sourceDir = path.join(modulePath, dir);
     const destinationDir = path.resolve(process.cwd(), directories[dir]);
 
@@ -72,11 +76,11 @@ export async function addModule(moduleName?: string) {
   }
 
   // Copy the main entry point (index.ts) to the `src/modules` directory
-  const moduleMainPath = path.join(modulePath, 'index.ts');
+  const moduleMainPath = path.join(modulePath, moduleConfiguration.mainEntry);
   const modulesDestination = path.resolve(process.cwd(), `src/modules/${moduleName}`);
   if (fs.existsSync(moduleMainPath)) {
     fs.ensureDirSync(modulesDestination);
-    fs.copySync(moduleMainPath, path.join(modulesDestination, 'index.ts'));
+    fs.copySync(moduleMainPath, path.join(modulesDestination, moduleConfiguration.mainEntry));
     console.log(chalk.green(`Copied entry point to src/modules/${moduleName}/index.ts`));
   } else {
     console.log(chalk.red(`No "index.ts" file found for module "${moduleName}".`));
@@ -86,9 +90,17 @@ export async function addModule(moduleName?: string) {
   configManager.setModule(moduleName, {
     installedAt: new Date().toISOString(),
   });
-  // execute npm i --save-dev @types/jsonwebtoken and npm i jsonwebtoken
-  await import('child_process').then((cp) => {
-    cp.execSync(`npm install jsonwebtoken --save-dev @types/jsonwebtoken`, { stdio: 'inherit' });
-  });
+
+  // Install dependencies
+  console.log(chalk.blue('Installing dependencies...'));
+  try {
+    await import('child_process').then((cp) => {
+      cp.execSync(`npm install jsonwebtoken @types/jsonwebtoken`, { stdio: 'inherit' });
+    });
+  } catch (error) {
+    console.error(chalk.red('Error installing dependencies:', error));
+    return;
+  }
+
   console.log(chalk.green(`Module "${moduleName}" installed successfully!`));
 }
