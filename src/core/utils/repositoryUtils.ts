@@ -96,7 +96,7 @@ function capitalize(str: string): string {
 export async function generateRepository(
   resourceName: string,
   targetDir: string,
-  repository?: OrmType
+  repository?: string
 ): Promise<void> {
   const capitalizedResourceName = capitalize(resourceName);
 
@@ -110,7 +110,7 @@ export async function generateRepository(
 
   // Generate specific repository if ORM is provided
   if (repository) {
-    const templateName = `${getOrmTemplateName(repository)}-${ResourceTypes.REPOSITORY}`;
+    const templateName = `${repository}-${ResourceTypes.REPOSITORY}`;
     const repositoryTemplate = await loadTemplate(templateName);
     const repositoryContent = replacePlaceholders(repositoryTemplate, capitalizedResourceName);
     const repositoryFilePath = path.join(targetDir, `${resourceName.toLowerCase()}.repository.ts`);

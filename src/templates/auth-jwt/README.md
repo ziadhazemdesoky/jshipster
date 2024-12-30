@@ -13,39 +13,6 @@ The `auth-jwt` module provides basic authentication functionality using JSON Web
 
 ## **Endpoints**
 
-### **1. POST `/auth/login`**
-Authenticates a user and returns a JSON Web Token (JWT).
-
-#### **Request Body**
-```json
-{
-  "username": "string",
-  "password": "string"
-}
-```
-
-#### **Response**
-- **200 OK**: Returns a JWT if the credentials are valid.
-  ```json
-  {
-    "token": "your-jwt-token"
-  }
-  ```
-- **400 Bad Request**: If the username or password is missing.
-  ```json
-  {
-    "message": "Username and password are required."
-  }
-  ```
-- **401 Unauthorized**: If the credentials are invalid.
-  ```json
-  {
-    "message": "Invalid credentials."
-  }
-  ```
-
----
-
 ### **2. GET `/auth/verify`**
 Verifies the validity of a JSON Web Token (JWT).
 

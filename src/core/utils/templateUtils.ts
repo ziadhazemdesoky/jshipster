@@ -5,7 +5,7 @@ import { SupportedOrms } from '../resourceTypes.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export async function loadTemplate(templateName: string): Promise<string> {
+export async function loadTemplate(templateName: string | undefined): Promise<string> {
     try {
         // Resolve the template path
         const templatePath = path.resolve(__dirname, `../templates/${templateName}.template.js`);
@@ -31,11 +31,12 @@ export function replacePlaceholders(template: string, placeholder: string): stri
     return result;
 }
 
-export function getOrmTemplateName(orm: SupportedOrms): string {
+export function getOrmTemplateName(orm: SupportedOrms | undefined): string | undefined {
     const modelTemplates: Record<SupportedOrms, string> = {
       [SupportedOrms.MONGOOSE]: 'mongoose',
       [SupportedOrms.SEQUELIZE]: 'sequelize',
       [SupportedOrms.GENERIC]: 'generic-model',
     };
-    return modelTemplates[orm];
+    if(orm)
+        return modelTemplates[orm];
   }

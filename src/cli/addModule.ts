@@ -3,17 +3,19 @@ import path from 'path';
 import chalk from 'chalk';
 import inquirer from 'inquirer';
 import { ConfigManager } from '../core/configManager.js';
+import { generateRepository } from '../core/utils/repositoryUtils.js';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const moduleConfiguration = {
-  directories: ['controller', 'service', 'route', 'model', 'repository'],
+  directories: ['controller', 'service', 'route', 'model', 'dto', 'repository'],
   mainEntry: 'index.ts',
+  templatesDir: path.resolve(__dirname, '../templates'),
 };
 
-export async function addModule(moduleName?: string) {
+export async function addModule(moduleName?: string): Promise<void> {
   const configManager = new ConfigManager();
   const directories = configManager.getDirectories();
 
@@ -30,48 +32,39 @@ export async function addModule(moduleName?: string) {
     moduleName = answers.chosenModule.trim();
   }
 
-  let modulePath = path.resolve(__dirname, '../templates', moduleName);
+  let modulePath = path.join(moduleConfiguration.templatesDir, moduleName);
 
-  // Check if the module exists locally or fetch it from npm
+  // Check if the module exists locally
   if (!fs.existsSync(modulePath)) {
-    if (!moduleName.startsWith('jhipster-')) {
-      moduleName = 'jhipster-' + moduleName;
-    }
-    console.log(chalk.blue(`Fetching "${moduleName}" from npm...`));
-    try {
-      await import('child_process').then((cp) => {
-        cp.execSync(`npm install ${moduleName}`, { stdio: 'inherit' });
-      });
-
-      const modulePackagePath = path.resolve(
-        process.cwd(),
-        'node_modules',
-        moduleName
-      );
-      modulePath = modulePackagePath;
-
-      if (!fs.existsSync(modulePath)) {
-        throw new Error(`Failed to fetch module "${moduleName}".`);
-      }
-    } catch (error) {
-      console.error(chalk.red(`Error fetching module "${moduleName}": ${error}`));
-      return;
-    }
+    console.error(chalk.red(`Module template "${moduleName}" not found locally.`));
+    return;
   }
 
-  console.log(chalk.green(`Installing module "${moduleName}"...`));
+  console.log(chalk.green(`Installing core module "${moduleName}"...`));
 
   // Distribute files into mapped directories
   for (const dir of moduleConfiguration.directories) {
     const sourceDir = path.join(modulePath, dir);
     const destinationDir = path.resolve(process.cwd(), directories[dir]);
 
-    if (fs.existsSync(sourceDir)) {
+    if (fs.existsSync(sourceDir) && dir !== 'repository') {
       fs.ensureDirSync(destinationDir);
       fs.copySync(sourceDir, destinationDir);
       console.log(chalk.green(`Copied "${dir}" files to ${directories[dir]}`));
-    } else {
+    } else if(dir !== 'repository') {
       console.log(chalk.yellow(`No "${dir}" files found in module "${moduleName}".`));
+    }
+
+    // Handle repositories with repository factory generation
+    if (dir === 'repository' && fs.existsSync(sourceDir)) {
+      const repositoryFiles = fs.readdirSync(sourceDir).filter((file) => file.endsWith('.repository.template.ts'));
+      for (const repoFile of repositoryFiles) {
+        const basename = path.basename(repoFile, '.repository.template.ts');
+        const ormName = basename.split('-')[0];
+        const resourceName = basename.split('-')[1];
+        const targetDir = directories.repository;
+        await generateRepository(resourceName, targetDir, ormName);
+      }
     }
   }
 
@@ -83,7 +76,7 @@ export async function addModule(moduleName?: string) {
     fs.copySync(moduleMainPath, path.join(modulesDestination, moduleConfiguration.mainEntry));
     console.log(chalk.green(`Copied entry point to src/modules/${moduleName}/index.ts`));
   } else {
-    console.log(chalk.red(`No "index.ts" file found for module "${moduleName}".`));
+    console.log(chalk.red(`No "${moduleConfiguration.mainEntry}" file found for module "${moduleName}".`));
   }
 
   // Update the project configuration
@@ -91,16 +84,22 @@ export async function addModule(moduleName?: string) {
     installedAt: new Date().toISOString(),
   });
 
-  // Install dependencies
   console.log(chalk.blue('Installing dependencies...'));
   try {
-    await import('child_process').then((cp) => {
-      cp.execSync(`npm install jsonwebtoken @types/jsonwebtoken`, { stdio: 'inherit' });
-    });
+    await installDependencies();
   } catch (error) {
     console.error(chalk.red('Error installing dependencies:', error));
     return;
   }
 
   console.log(chalk.green(`Module "${moduleName}" installed successfully!`));
+}
+
+/**
+ * Installs dependencies required for the module.
+ */
+async function installDependencies(): Promise<void> {
+  await import('child_process').then((cp) => {
+    cp.execSync(`npm install jsonwebtoken @types/jsonwebtoken`, { stdio: 'inherit' });
+  });
 }

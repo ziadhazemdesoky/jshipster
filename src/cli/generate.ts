@@ -3,7 +3,7 @@ import path from 'path';
 import chalk from 'chalk';
 import { ConfigManager } from '../core/configManager.js';
 import { ResourceCategories, ResourceTypes, SupportedOrms, ResourceType, OrmType, toLowerCase } from '../core/resourceTypes.js';
-import { loadTemplate } from '../core/utils/templateUtils.js';
+import { getOrmTemplateName, loadTemplate } from '../core/utils/templateUtils.js';
 import { ensureDirectoryExists, generateResourceFile, writeFileSafely } from '../core/utils/fileUtils.js';
 import { generateRepository } from '../core/utils/repositoryUtils.js';
 import { generateSwaggerFromControllers } from '../core/utils/swaggerUtils.js';
@@ -138,7 +138,7 @@ async function generateFullModule(
     ensureDirectoryExists(componentDir);
 
     if (component === ResourceTypes.REPOSITORY) {
-      await generateRepository(resourceName, componentDir, orm);
+      await generateRepository(resourceName, componentDir, getOrmTemplateName(orm));
     } else {
       await generateResourceFile(resourceName, component, componentDir, orm);
     }

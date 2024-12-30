@@ -4,28 +4,6 @@ import { AuthService } from '../service/auth.service';
 const authService = new AuthService();
 
 export class AuthController {
-  /**
-   * Handle user login and return a JWT.
-   */
-  public login(req: Request, res: Response): void {
-    const { username, password } = req.body;
-
-    if (!username || !password) {
-      res.status(400).json({ message: 'Username and password are required.' });
-      return;
-    }
-
-    if (authService.verifyCredentials(username, password)) {
-      const token = authService.generateToken({ username });
-      res.status(200).json({ token });
-    } else {
-      res.status(401).json({ message: 'Invalid credentials.' });
-    }
-  }
-
-  /**
-   * Verify the provided JWT.
-   */
   public verify(req: Request, res: Response): void {
     const token = req.headers.authorization?.split(' ')[1];
 

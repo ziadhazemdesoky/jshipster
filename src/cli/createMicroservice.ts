@@ -1,7 +1,7 @@
 import inquirer from 'inquirer';
 import chalk from 'chalk';
 import path from 'path';
-import { loadTemplate, replacePlaceholders } from '../core/utils/templateUtils.js';
+import { getOrmTemplateName, loadTemplate, replacePlaceholders } from '../core/utils/templateUtils.js';
 import { OrmType, ResourceTypes, SupportedOrms } from '../core/resourceTypes.js';
 import { ensureDirectoryExists, generateResourceFile, writeFileSafely } from '../core/utils/fileUtils.js';
 import { generateRepository } from '../core/utils/repositoryUtils.js';
@@ -83,7 +83,7 @@ async function generateComponents(
         ensureDirectoryExists(componentDir);
 
         if (component.type === ResourceTypes.REPOSITORY) {
-            await generateRepository(component.name, componentDir, orm);
+            await generateRepository(component.name, componentDir, getOrmTemplateName(orm));
         } else if (component.type === ResourceTypes.SWAGGER) {
             await generateSwaggerFromControllers(
                 `${serviceName}/src/controllers`,

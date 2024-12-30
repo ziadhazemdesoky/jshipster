@@ -22,12 +22,4 @@ export class AuthService {
       return '';
     }
   }
-
-  /**
-   * Mock function to verify user credentials.
-   */
-  public verifyCredentials(username: string, password: string): boolean {
-    // Replace with real user validation (e.g., database query)
-    return username === 'admin' && password === 'password';
-  }
 }
